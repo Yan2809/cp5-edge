@@ -38,8 +38,7 @@ Os dados são enviados via **protocolo MQTT** para o **broker público `test.mos
 | **LDR - OUT (analógico)** | GPIO 34 | Entrada analógica |
 
 🖼️ **Diagrama de Montagem (Wokwi / Fritzing):**  
-![Circuito ESP32 com DHT22 e LDR](./circuito.png)
-
+![Circuito ESP32 com DHT22 e LDR](./image.png)
 ---
 
 ## 🛰️ Fluxo de Dados IoT
