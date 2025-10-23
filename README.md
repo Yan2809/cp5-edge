@@ -159,29 +159,9 @@ const int BROKER_PORT = 1883;               // Porta do Broker MQTT
 
 ---
 
-## 👨‍💻 Autor
-**Yan Barutti**  
-FIAP — Engenharia de Software  
-📅 *Check Point 5 – Edge Computing (2025)*  
-📫 [LinkedIn](#) | [GitHub](#)
-
-**Leonardo Silva**  
-FIAP — Engenharia de Software  
-📅 *Check Point 5 – Edge Computing (2025)*  
-📫 [LinkedIn](#) | [GitHub](#)
-
-**Guilherme Araújo**  
-FIAP — Engenharia de Software  
-📅 *Check Point 5 – Edge Computing (2025)*  
-📫 [LinkedIn](#) | [GitHub](#)
-
-**Samuel Monteiro**  
-FIAP — Engenharia de Software  
-📅 *Check Point 5 – Edge Computing (2025)*  
-📫 [LinkedIn](#) | [GitHub](#)
-
-**Lucas Toledo**  
-FIAP — Engenharia de Software  
-📅 *Check Point 5 – Edge Computing (2025)*  
-📫 [LinkedIn](#) | [GitHub](#)
-
+## 👨‍💻 Autores
+**Yan Barutti — 566412**   
+**Samuel Monteiro — 564391**  
+**Leonardo Silva — 564929**   
+**Guilherme Araújo — 561848**  
+**Lucas Toledo — 563271**  
