@@ -40,8 +40,8 @@ Os dados são enviados via **protocolo MQTT**, no formato **JSON compatível com
 | **LDR - GND** | GND | Terra |
 | **LDR - OUT (analógico)** | GPIO 34 | Entrada analógica |
 
-🖼️ **Diagrama de Montagem:**  
-![Circuito ESP32 com DHT22 e LDR](./image.png)
+🖼️ **Diagrama de Montagem:** <br><br>
+![Circuito ESP32 com DHT22 e LDR] <img src="./image.png" width="600">
 
 ---
 
