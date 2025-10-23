@@ -1,4 +1,4 @@
-<h1 align="center"># 🌡️ Projeto IoT com ESP32 — Monitoramento Ambiental da Vinheria Agnello (FIWARE + MQTT)</h1>
+<h1 align="center">🌡️ Projeto IoT com ESP32 — Monitoramento Ambiental da Vinheria Agnello (FIWARE + MQTT)</h1>
 
 ## 📘 Descrição Geral
 Este projeto implementa um sistema **IoT** com o **ESP32**, integrando os sensores **DHT22 (temperatura e umidade)** e **LDR (luminosidade)** para o monitoramento de ambientes em tempo real.  
