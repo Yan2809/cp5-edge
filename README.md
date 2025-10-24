@@ -17,6 +17,20 @@ Os dados são enviados via **protocolo MQTT**, no formato **JSON compatível com
 
 ---
 
+## 🧰 Ferramentas Utilizadas
+| Categoria | Ferramenta / Tecnologia |
+|------------|--------------------------|
+| 🧱 **Hardware / Simulação** | ESP32 DevKit, Wokwi Simulator |
+| 💻 **Desenvolvimento** | Arduino IDE |
+| ⚙️ **Comunicação** | MQTT, Broker Mosquitto, MyMQTT (Android) |
+| 🧠 **Back-end IoT** | FIWARE (Orion Context Broker) |
+| 🐳 **Containerização** | Docker e Docker Compose |
+| 🔗 **APIs e Testes** | Postman |
+| 📂 **Controle de Versão** | Git, Git Bash e GitHub |
+| 💬 **Linguagem** | Arduino (C/C++) |
+
+---
+
 ## ⚙️ Componentes Utilizados
 
 | Componente | Quantidade | Função |
@@ -40,8 +54,8 @@ Os dados são enviados via **protocolo MQTT**, no formato **JSON compatível com
 | **LDR - GND** | GND | Terra |
 | **LDR - OUT (analógico)** | GPIO 34 | Entrada analógica |
 
-🖼️ **Diagrama de Montagem:** <br><br>
-![Circuito ESP32 com DHT22 e LDR] <img src="./image.png" width="600">
+🖼️ **Diagrama de Montagem:**  
+<img src="./image.png" width="550">
 
 ---
 
@@ -90,11 +104,7 @@ Os dados são enviados via **protocolo MQTT**, no formato **JSON compatível com
 ## 🧠 Configuração do Ambiente
 
 ### 🔧 Requisitos
-- **Plataforma:** Arduino IDE, PlatformIO ou [Wokwi Simulator](https://wokwi.com) 
-
-💡 **Dica:** o [Wokwi](https://wokwi.com) permite testar todo o projeto **de forma online**, incluindo o ESP32, o sensor **DHT22**, o **LDR** e a comunicação **MQTT**.  
-Ideal para validação do código antes da execução em hardware físico.
-
+- **Plataforma:** Arduino IDE, PlatformIO ou [Wokwi Simulator](https://wokwi.com)
 - **Placa:** ESP32 Dev Module / ESP32 DevKit
 - **Bibliotecas necessárias:**
   - `WiFi.h`
@@ -103,6 +113,8 @@ Ideal para validação do código antes da execução em hardware físico.
   - `DHT.h`
   - `DHT_U.h`
   - `time.h`
+
+💡 **Dica:** O [Wokwi](https://wokwi.com) permite testar o projeto **de forma online**, simulando o ESP32, sensores e a conexão MQTT antes da execução em hardware físico.
 
 ---
 
@@ -152,16 +164,28 @@ const int BROKER_PORT = 1883;               // Porta do Broker MQTT
 
 ---
 
+## 🧱 Integração com FIWARE (Orion Context Broker, STH-Comet e IoT Agent MQTT)
+O projeto pode ser integrado ao **FIWARE** utilizando o **Orion Context Broker** para armazenar e gerenciar os dados enviados via MQTT.  
+Essa configuração inclui a criação de uma **máquina virtual (VM)**, execução de containers via **Docker Compose** e testes no **Postman**.
+
+📺 **Assista ao vídeo tutorial completo com o passo a passo:**  
+👉 [Tutorial FIWARE + Docker + Postman (YouTube)](https://youtu.be/aT_5PpQ0mRk?si=AMZZoOOsoBCV9-i2)
+
+---
+
 ## 🚀 Próximos Passos
-- Desenvolver **dashboards** personalizados para visualização em tempo real;  
-- Criar **alertas automáticos** (ex.: temperatura > 25°C ou baixa luminosidade);  
-- Futuramente, implementar **atuadores** (ex.: ventilação ou iluminação automática).
+- Criar **dashboards** personalizados com os dados do FIWARE;  
+- Implementar **alertas automáticos** (ex.: temperatura > 25°C ou baixa luminosidade);  
+- Adicionar **atuadores inteligentes**, como ventiladores e iluminação automatizada.
 
 ---
 
 ## 👨‍💻 Autores
-**Yan Barutti — 566412**   
+**Yan Barutti — 566412**  
 **Samuel Monteiro — 564391**  
-**Leonardo Silva — 564929**   
+**Leonardo Silva — 564929**  
 **Guilherme Araújo — 561848**  
 **Lucas Toledo — 563271**  
+
+FIAP — Engenharia de Software  
+📅 *Check Point 5 — Edge Computing (2025)*
