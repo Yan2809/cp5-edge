@@ -3,7 +3,7 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
-#include "time.h" // Para timestamp NTP
+#include <time.h> // Para timestamp NTP
 
 // === CONFIGURAÇÕES EDITÁVEIS ===
 const char* SSID = "Wokwi-GUEST";                  // Rede Wi-Fi (2.4GHz)
@@ -15,13 +15,11 @@ const int BROKER_PORT = 1883;                      // Porta do Broker MQTT
 #define LDR_PIN 34       // Pino analógico do LDR
 #define DHTPIN 15        // Pino do DHT22
 #define DHTTYPE DHT22    // Tipo do sensor DHT
+#define LED_PIN 2
 
 // === TÓPICO BASE NGSI (FIWARE) ===
-const char* TOPICO_BASE = "/TEF/device001/attrs";  // Envia tudo junto
-const char* TOPICO_TIMESTAMP = "/TEF/device001/attrs/timestamp";
-const char* TOPICO_LUZ = "/TEF/device001/attrs/luminosidade";
-const char* TOPICO_TEMP = "/TEF/device001/attrs/temperatura";
-const char* TOPICO_UMID = "/TEF/device001/attrs/umidade";
+const char* TOPICO_PUBLISH = "/TEF/device001/attrs";  // Envia tudo junto
+const char* TOPICO_CMD = "/TEF/device001/cmd"; 
 const char* ID_MQTT = "fiware_001";
 
 // === OBJETOS ===
@@ -33,6 +31,9 @@ DHT dht(DHTPIN, DHTTYPE);
 const char* ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = -3 * 3600;  // Horário de Brasília
 const int daylightOffset_sec = 0;
+
+// === VARIÁVEL DE ESTADO DO LED ===
+char estadoLED = '0'; // '0' desligado, '1' ligado
 
 // === FUNÇÕES ===
 void initSerial() {
@@ -55,6 +56,7 @@ void initWiFi() {
 
 void initMQTT() {
   MQTT.setServer(BROKER_MQTT, BROKER_PORT);
+  MQTT.setCallback(callback);
 }
 
 void reconnectMQTT() {
@@ -63,8 +65,13 @@ void reconnectMQTT() {
     Serial.println(BROKER_MQTT);
     if (MQTT.connect(ID_MQTT)) {
       Serial.println("Conectado ao Broker MQTT!");
+
+      // Inscreve-se no tópico de controle
+      MQTT.subscribe(TOPICO_CMD);
+      Serial.print("🛰 Assinado no tópico: ");
+      Serial.println(TOPICO_CMD);
     } else {
-      Serial.println("Falha na conexão. Tentando novamente em 2s...");
+      Serial.println("Falha na conexão. Código de erro: ");
       Serial.println(MQTT.state());
       delay(2000);
     }
@@ -73,23 +80,29 @@ void reconnectMQTT() {
 
 void initTime() {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  Serial.println("Sincronizando horário via NTP...");
+  Serial.println("⏳ Sincronizando horário via NTP...");
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
     Serial.println("Falha ao obter horário!");
     return;
   }
-  Serial.println("Horário sincronizado com sucesso!");
+  Serial.println("\n⏰Horário sincronizado com sucesso!");
 }
 
 String getTimestamp() {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {
+    Serial.println("❌ Erro ao obter horário local");
     return "SemTempo";
   }
-  char buffer[25];
-  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
-  return String(buffer);
+
+  char time_str[64];
+  strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  Serial.print("Data/Hora Formatada: ");
+  Serial.println(time_str);
+  return String(time_str);
+
+  //strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
 }
 
 void verificaConexoes() {
@@ -101,11 +114,37 @@ void verificaConexoes() {
   }
 }
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  String msg;
+  for (unsigned int i = 0; i < length; i++) {
+    msg += (char)payload[i];
+  }
+  msg.trim();
+  Serial.print("📩 Mensagem recebida: ");
+  Serial.println(msg);
+
+  if (msg.equals("device001@on|")) {
+    digitalWrite(LED_PIN, HIGH);
+    estadoLED = '1';
+    MQTT.publish(TOPICO_PUBLISH, "s|on");
+    Serial.println("💡 LED LIGADO e status publicado!");
+  } 
+  else if (msg.equals("device001@off|")) {
+    digitalWrite(LED_PIN, LOW);
+    estadoLED = '0';
+    MQTT.publish(TOPICO_PUBLISH, "s|off");
+    Serial.println("💤 LED DESLIGADO e status publicado!");
+  } 
+  else {
+    Serial.println("Comando desconhecido.");
+  }
+}
+
 void enviaSensoresMQTT() {
   // === LDR ===
   int valorLDR = analogRead(LDR_PIN);
   // Inversão: quanto mais luz, maior o valor de luminosidade (%)
-  float luminosidade = (1.0 - (float)valorLDR / 4095.0) * 100.0;
+  float luminosidade = map(valorLDR, 4095, 0, 100, 0);
 
   // === DHT22 ===
   float temperatura = dht.readTemperature();
@@ -128,44 +167,21 @@ void enviaSensoresMQTT() {
   mensagem += "}";
 
   // === Publica tudo em um único tópico ===
-  MQTT.publish(TOPICO_BASE, mensagem.c_str());
+  MQTT.publish(TOPICO_PUBLISH, mensagem.c_str());
 
   // === Debug no Serial ===
   Serial.println("📡 Dados publicados no Broker MQTT:");
   Serial.println(mensagem);
   Serial.println("-----------------------------");
 
-  // === Publica valores individualmente ===
-
-  // Timestamp
-  mensagem = timestamp;
-  MQTT.publish(TOPICO_TIMESTAMP, mensagem.c_str());
-  Serial.print("Timestamp publicado: ");
-  Serial.println(mensagem.c_str());
-
-  // Luminosidade
-  mensagem = String(luminosidade, 1);
-  MQTT.publish(TOPICO_LUZ, mensagem.c_str());
-  Serial.print("Luminosidade publicada: ");
-  Serial.println(mensagem.c_str());
-
-  // Temperatura
-  mensagem = String(temperatura, 1);
-  MQTT.publish(TOPICO_TEMP, mensagem.c_str());
-  Serial.print("Temperatura publicada: ");
-  Serial.println(mensagem.c_str());
-
-  // Umidade
-  mensagem = String(umidade, 1);
-  MQTT.publish(TOPICO_UMID, mensagem.c_str());
-  Serial.print("Umidade publicada: ");
-  Serial.println(mensagem.c_str());
-
-  Serial.println("-----------------------------");
 }
 
 void setup() {
   initSerial();
+
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW); // LED inicia desligado
+
   initWiFi();
   initMQTT();
   dht.begin();
